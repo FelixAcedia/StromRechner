@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Projekt_FelixAssert
 {
-    [Version("F. Assert", classVersion = "1.0.0")]
+    [Version("F. Assert", classVersion = "1.1.0")]
     internal class Rechner
     {
         private double u;
@@ -32,7 +32,7 @@ namespace Projekt_FelixAssert
             Console.Write(" Ohm");
             if (R <= 0)
             {
-                ClearLine();
+                ClearLine(error: true);
                 GetR();
             }
             return R;
@@ -44,7 +44,7 @@ namespace Projekt_FelixAssert
             Console.Write(" V");
             if (I == 0)
             {
-                ClearLine();
+                ClearLine(error: true);
                 GetI();
             }
             return I;
@@ -52,40 +52,53 @@ namespace Projekt_FelixAssert
 
 
         //U = R * I
-        public static double Wiederstand()
+        public static double Wiederstand(string header)
         {
             Console.Clear();
-            Console.WriteLine("Wiederstand");
+            Console.WriteLine(header);
             double rechnen = (GetU() / GetI());
-            if (rechnen < 0)
+            if (rechnen <= 0)
             {
-                Console.WriteLine("\nPhysikalisch nicht möglich! Wiederstand muss positive sein.");
-                Thread.Sleep(100);
-                Wiederstand();
+                Console.CursorTop += 2;
+                Console.Write("Physikalisch nicht möglisch!");
+                Thread.Sleep(1000);
+                Wiederstand(header);
             }
             return rechnen;
         }
-        public static double Stromstaerke()
+        public static double Stromstaerke(string header)
         {
             Console.Clear();
-            Console.WriteLine("Stromstärke");
+            Console.WriteLine(header);
             return GetU() / GetR();
         }
-        public static double Spannung()
+        public static double Spannung(string header)
         {
             Console.Clear();
-            Console.WriteLine("Spannung");
+            Console.WriteLine(header);
             return GetR() * GetI();
         }
 
-        public static void ClearLine()
+        public static void ClearLine(bool error)
         {
-            for(int i = Console.CursorLeft, l = 0; i > 0; i--, l++)
+            if(error)
+            {
+                Console.CursorTop += 2;
+                Console.Write("Ungueltige eingabe!");
+                Thread.Sleep(1000);
+                Clear();
+                Console.CursorTop -= 2;
+            }
+            Clear();
+            Console.CursorTop--;
+        }
+        private static void Clear()
+        {
+            for (int i = Console.CursorLeft, l = 0; i > 0; i--, l++)
             {
                 Console.CursorLeft = l;
                 Console.Write(' ');
             }
-            Console.CursorTop--;
         }
     }
 }
