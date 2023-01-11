@@ -2,7 +2,7 @@
 
 namespace Projekt_FelixAssert
 {
-    [Version("F. Assert", programVersion = "1.0.2.2")]
+    [Version("F. Assert", programVersion = "1.0.3.2")]
     internal class Program
     {
         private static string[] startMenupoints = { "Rechner", "Credits" };
@@ -33,13 +33,7 @@ namespace Projekt_FelixAssert
             ClosingApplicationSupervisitor.Start();
             while (true)
             {
-                KonsoleMenu startMenu = new KonsoleMenu(startMenupoints);
-                KonsoleMenu.CenteredVoidConsoleMenu();
-                taste = Console.ReadKey();
-
-                if (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
-                    KonsoleMenu.CenteredWriteCursour("Ungültige eingabe", Console.CursorTop + 1);
-                WaitForESC(ESCwait);
+                CreateNewMenu(startMenupoints, ESCwait);
                 switch(KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49])
                 {
                     case "Rechner":
@@ -60,17 +54,9 @@ namespace Projekt_FelixAssert
         {
             double ergebnis = 0;
             string endzeichen = "";
-            while (true)
-            {
-                KonsoleMenu rechnerMenu = new KonsoleMenu(rechnerMenupoints);
-                KonsoleMenu.CenteredVoidConsoleMenu();
-                taste = Console.ReadKey(true);
-
-                if (KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
-                    break;
-                KonsoleMenu.CenteredWriteCursour("Ungültige eingabe", Console.CursorTop + 1);
-                WaitForESC(ESCwait);
-            }
+            while (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
+                CreateNewMenu(rechnerMenupoints, ESCwait);
+            
             while (true)
             {
                 switch (KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49])
@@ -101,6 +87,16 @@ namespace Projekt_FelixAssert
                     break;
                 WaitForESC(ESCwait);
             }
+        }
+        private static void CreateNewMenu(string[] menuPoints, bool ESCwait)
+        {
+            KonsoleMenu menu = new KonsoleMenu(menuPoints);
+            KonsoleMenu.CenteredVoidConsoleMenu();
+            taste = Console.ReadKey(true);
+
+            if (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
+                KonsoleMenu.CenteredWriteCursour("Ungültige eingabe", Console.CursorTop + 1);
+            WaitForESC(ESCwait);
         }
     }
 }
