@@ -2,19 +2,16 @@
 
 namespace Projekt_FelixAssert
 {
-    [Version("F. Assert", programVersion = "1.0.1.2")]
+    [Version("F. Assert", programVersion = "1.0.2.2")]
     internal class Program
     {
-        private static string[] menupoints = { "Spannung (U = R * I)", "Wiederstand (R = U / I)", "Stromstaerke (I = U / R)" };
-        static KonsoleMenu menu;
+        private static string[] startMenupoints = { "Rechner", "Credits" };
+        private static string[] rechnerMenupoints = { "Spannung (U = R * I)", "Wiederstand (R = U / I)", "Stromstaerke (I = U / R)" };
         public static ConsoleKeyInfo taste;
 
         [STAThread]
         static void Main(string[] args)
         {
-            taste = Console.ReadKey();
-            double ergebnis= 0;
-            string endzeichen = "";
             bool ESCwait = false;
             Thread ClosingApplicationSupervisitor = new Thread(new ThreadStart(() =>
             {
@@ -23,14 +20,11 @@ namespace Projekt_FelixAssert
                     if (taste.Key == ConsoleKey.Escape)
                     {
                         ESCwait = true;
-                        Thread.Sleep(200);
-                        Console.Clear();
+                        WaitForESC(false);
                         Console.WriteLine("Rechner verlassen? [ESC/ any key]");
                         taste = Console.ReadKey();
                         if(taste.Key == ConsoleKey.Escape)
-                        {
                             Environment.Exit(0);
-                        }
                         else
                             ESCwait = false;
                     }
@@ -39,26 +33,46 @@ namespace Projekt_FelixAssert
             ClosingApplicationSupervisitor.Start();
             while (true)
             {
-                while (true)
-                {
-                    menu = new KonsoleMenu(menupoints);
-                    KonsoleMenu.CenteredVoidConsoleMenu();
-                    taste = Console.ReadKey();
+                KonsoleMenu startMenu = new KonsoleMenu(startMenupoints);
+                KonsoleMenu.CenteredVoidConsoleMenu();
+                taste = Console.ReadKey();
 
-                    if (KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
-                        break;
+                if (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
                     KonsoleMenu.CenteredWriteCursour("Ungültige eingabe", Console.CursorTop + 1);
-                    Thread.Sleep(1000);
-                    if (ESCwait)
-                    {
-                        while (ESCwait)
-                        {
-                            Thread.Sleep(200);
-                        }
-                    }
-                    Console.Clear();
-
+                WaitForESC(ESCwait);
+                switch(KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49])
+                {
+                    case "Rechner":
+                        RechnerMenu(ESCwait);
+                        break;
                 }
+            }
+        }
+        private static void WaitForESC(bool ESCwait)
+        {
+            Thread.Sleep(200);
+            Console.Clear();
+            if (ESCwait)
+                while (ESCwait)
+                    Thread.Sleep(200);
+        }
+        private static void RechnerMenu(bool ESCwait)
+        {
+            double ergebnis = 0;
+            string endzeichen = "";
+            while (true)
+            {
+                KonsoleMenu rechnerMenu = new KonsoleMenu(rechnerMenupoints);
+                KonsoleMenu.CenteredVoidConsoleMenu();
+                taste = Console.ReadKey(true);
+
+                if (KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
+                    break;
+                KonsoleMenu.CenteredWriteCursour("Ungültige eingabe", Console.CursorTop + 1);
+                WaitForESC(ESCwait);
+            }
+            while (true)
+            {
                 switch (KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49])
                 {
                     case "Spannung (U = R * I)":
@@ -74,19 +88,18 @@ namespace Projekt_FelixAssert
                         endzeichen = " V";
                         break;
                 }
-                Console.WriteLine($"\n{KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49]}: {Math.Round(ergebnis, 2) + endzeichen}");
+                Console.WriteLine($"\n{KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49]}: {(Math.Round(ergebnis, 3) == 0 ? ergebnis : Math.Round(ergebnis, 3)) + endzeichen}");
 
-
-                Console.WriteLine("Rechner verlassen? [ESC/ any key]");
-                taste = Console.ReadKey();
-                Thread.Sleep(200);
-                if (ESCwait)
+                Console.WriteLine("Drücke...");
+                for (int i = 0; i < KonsoleMenu.konsolePoints.Count; i++)
                 {
-                    while (ESCwait)
-                    {
-                        Thread.Sleep(200);
-                    }
+                    Console.WriteLine($"\tfür {KonsoleMenu.konsolePoints[i]}: {i + 1}");
                 }
+                Console.WriteLine("\nRechner verlassen mit ESC und um zum Menue zu kommen drücke beliebige taste. [ESC/ any key]");
+                taste = Console.ReadKey();
+                if (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49) && taste.Key != ConsoleKey.Escape)
+                    break;
+                WaitForESC(ESCwait);
             }
         }
     }

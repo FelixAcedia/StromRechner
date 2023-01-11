@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Projekt_FelixAssert
+﻿namespace Projekt_FelixAssert
 {
     [Version("F. Assert", classVersion = "1.1.0")]
     internal class Rechner
@@ -51,7 +45,6 @@ namespace Projekt_FelixAssert
         }
 
 
-        //U = R * I
         public static double Wiederstand(string header)
         {
             Console.Clear();
