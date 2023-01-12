@@ -2,47 +2,73 @@
 
 namespace Projekt_FelixAssert
 {
-    [Version("F. Assert", programVersion = "1.0.3.2")]
+    [Version("F. Assert", programVersion = "1.0.4.2")]
     internal class Program
     {
-        private static string[] startMenupoints = { "Rechner", "Credits" };
-        private static string[] rechnerMenupoints = { "Spannung (U = R * I)", "Wiederstand (R = U / I)", "Stromstaerke (I = U / R)" };
+        /// <summary>
+        /// Eine Variable für die Allgemeine Tasten übergabe im Programm.
+        /// </summary>
         public static ConsoleKeyInfo taste;
-
+        /// <summary>
+        /// Ein Array mit den Listenpunkten für das Start Menu.
+        /// </summary>
+        private static string[] startMenupoints = { "Rechner", "Credits" };
+        /// <summary>
+        /// Ein Array mit den Listenpunkten für das Rechner Menu.
+        /// </summary>
+        private static string[] rechnerMenupoints = { "Spannung (U = R * I)", "Wiederstand (R = U / I)", "Stromstaerke (I = U / R)" };
+        /// <summary>
+        /// Ein Bool welcher zeigt ob der Program ablauf auf die Escape-Sicherheitsabfrage warten soll.
+        /// </summary>
+        private static bool ESCwait = false;
+        /// <summary>
+        /// Ein Thread der dauerhaft abfragt ob die Taste "Escape" gedrückt wurden und nachdem eine erneute Sicherheitsabfrage zum Schließen des Programmes macht.
+        /// </summary>
+        private static Thread ClosingApplicationSupervisitor = new Thread(new ThreadStart(() =>
+        {
+            while (true)
+                if (taste.Key == ConsoleKey.Escape)
+                {
+                    ESCwait = true;
+                    WaitForESC();
+                    Console.WriteLine("Rechner verlassen? [ESC/ any key]");
+                    taste = Console.ReadKey();
+                    if (taste.Key == ConsoleKey.Escape)
+                        Environment.Exit(0);
+                    else
+                        ESCwait = false;
+                }
+        }));
         [STAThread]
         static void Main(string[] args)
         {
-            bool ESCwait = false;
-            Thread ClosingApplicationSupervisitor = new Thread(new ThreadStart(() =>
-            {
-                while (true)
-                {
-                    if (taste.Key == ConsoleKey.Escape)
-                    {
-                        ESCwait = true;
-                        WaitForESC(false);
-                        Console.WriteLine("Rechner verlassen? [ESC/ any key]");
-                        taste = Console.ReadKey();
-                        if(taste.Key == ConsoleKey.Escape)
-                            Environment.Exit(0);
-                        else
-                            ESCwait = false;
-                    }
-                }
-            }));
+            Console.CursorVisible = false;
             ClosingApplicationSupervisitor.Start();
             while (true)
             {
-                CreateNewMenu(startMenupoints, ESCwait);
-                switch(KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49])
+                CreateNewMenu(startMenupoints);
+                if (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
+                    KonsoleMenu.CenteredWriteCursour("Ungültige eingabe", Console.CursorTop + 1);
+                else
                 {
-                    case "Rechner":
-                        RechnerMenu(ESCwait);
-                        break;
+                    switch (KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49])
+                    {
+                        case "Rechner":
+                            RechnerMenu(rechnerMenupoints);
+                            break;
+                        case "Credits":
+                            string[] links = { "https://github.com/FelixAcedia" };
+                            KonsoleMenu.CenteredCredits("Felix Assert", links);
+                            taste = Console.ReadKey(true);
+                            break;
+                    }
                 }
             }
         }
-        private static void WaitForESC(bool ESCwait)
+        /// <summary>
+        /// Eine Methode die den ablauf des Programmes stoppt und wartet bis die Escape Sicherheitsabfrage endet.
+        /// </summary>
+        private static void WaitForESC()
         {
             Thread.Sleep(200);
             Console.Clear();
@@ -50,13 +76,20 @@ namespace Projekt_FelixAssert
                 while (ESCwait)
                     Thread.Sleep(200);
         }
-        private static void RechnerMenu(bool ESCwait)
+        /// <summary>
+        /// Eine Methode für das Erstellen des Rechner Menu.
+        /// </summary>
+        /// <param name="rechnerMenupoints"></param>
+        private static void RechnerMenu(string[] rechnerMenupoints)
         {
             double ergebnis = 0;
             string endzeichen = "";
-            while (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
-                CreateNewMenu(rechnerMenupoints, ESCwait);
-            
+            while (true)
+            {
+                CreateNewMenu(rechnerMenupoints);
+                if (KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
+                    break;
+            } 
             while (true)
             {
                 switch (KonsoleMenu.konsolePoints[(int)taste.KeyChar - 49])
@@ -81,22 +114,23 @@ namespace Projekt_FelixAssert
                 {
                     Console.WriteLine($"\tfür {KonsoleMenu.konsolePoints[i]}: {i + 1}");
                 }
-                Console.WriteLine("\nRechner verlassen mit ESC und um zum Menue zu kommen drücke beliebige taste. [ESC/ any key]");
                 taste = Console.ReadKey();
                 if (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49) && taste.Key != ConsoleKey.Escape)
                     break;
-                WaitForESC(ESCwait);
+                WaitForESC();
             }
         }
-        private static void CreateNewMenu(string[] menuPoints, bool ESCwait)
+        /// <summary>
+        /// Eine Methode zum Erstellen eines neuen Menus.
+        /// </summary>
+        /// <param name="menuPoints"></param>
+        private static void CreateNewMenu(string[] menuPoints)
         {
             KonsoleMenu menu = new KonsoleMenu(menuPoints);
+            Console.Write("Credits: Felix Assert");
             KonsoleMenu.CenteredVoidConsoleMenu();
             taste = Console.ReadKey(true);
-
-            if (!KonsoleMenu.konsolePoints.ContainsKey((int)taste.KeyChar - 49))
-                KonsoleMenu.CenteredWriteCursour("Ungültige eingabe", Console.CursorTop + 1);
-            WaitForESC(ESCwait);
+            WaitForESC();
         }
     }
 }

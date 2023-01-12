@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using static System.Net.Mime.MediaTypeNames;
 
 namespace Projekt_FelixAssert
 {
+    /// <summary>
+    /// Eine Klasse mit Methoden zur Erstellung verschiedener von vschiedenen Konsolen Menüen.
+    /// </summary>
     [Version("F. Assert", classVersion = "1.0.0")]
     internal class KonsoleMenu
     {
@@ -25,14 +24,19 @@ namespace Projekt_FelixAssert
         }
         public static ConsoleColor Bg { get => Console.BackgroundColor; set => Console.BackgroundColor = value; }
         public static ConsoleColor Fg { get => Console.ForegroundColor; set => Console.ForegroundColor = value; }
-
-        public static void Credits(string name)
+        public static void CenteredCredits(string name, int y = 2)
         {
-
+            CenteredWriteCursour("Credits", y += 2);
+            CenteredWriteCursour(name, y += 2);
+            CenteredWriteCursour("-  ESC fuer Programm Abbruch und Beliebige Taste um zum Menu zu kommen -", y += 2);
         }
-        public static void Credits(string name, string[] links)
+        public static void CenteredCredits(string name, string[] links, int y = 2, int a = 2)
         {
-
+            CenteredWriteCursour("Credits", y += a);
+            CenteredWriteCursour(name, y+=a);
+            foreach(var link in links)
+                CenteredWriteCursour(link, y += a);
+            CenteredWriteCursour("-  ESC fuer Programm Abbruch und Beliebige Taste um zum Menu zu kommen -", y += a);
         }
         public static void WriteCursour(string text, int x, int y)
         {
@@ -44,11 +48,21 @@ namespace Projekt_FelixAssert
             Console.SetCursorPosition(Console.WindowWidth/2 - text.Length/2, y);
             Console.WriteLine(text);
         }
+        /// <summary>
+        /// Eine Methode zur Erstellung eines Konsolen Menües mit Rückgabewert. Parameter y: Stellt die Y-kordinate dar, Parameter a: Stellt den Allgemeinen abstand der Menu Punkte dar, Parameter x: Stellt die X-Kordinate dar.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="a"></param>
         public static ConsoleKeyInfo ConsoleMenu(int x = 3, int y = 2, int a = 2)
         {
             VoidConsoleMenu(x, y, a);
             return Console.ReadKey();
         }
+        /// <summary>
+        /// Eine Methode zur Erstellung eines Konsolen Menües ohne Rückgabewert. Parameter y: Stellt die Y-kordinate dar, Parameter a: Stellt den Allgemeinen abstand der Menu Punkte dar, Parameter x: Stellt die X-Kordinate dar.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="a"></param>
         public static void VoidConsoleMenu(int x = 3, int y = 2, int a = 2)
         {
             WriteCursour("Konsolen Menue", x, y);
@@ -61,11 +75,21 @@ namespace Projekt_FelixAssert
             Console.SetCursorPosition(x, y + 4);
             Console.Write("Ihre Eingabe: ");
         }
+        /// <summary>
+        /// Eine Methode zur Erstellung eines zentrierten Konsolen Menües mit Rückgabewert. Parameter y: Stellt die Y-kordinate dar, Parameter a: Stellt den Allgemeinen abstand der Menu Punkte dar.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="a"></param>
         public static ConsoleKeyInfo CenteredConsoleMenu(int y = 2, int a = 2)
         {
             CenteredVoidConsoleMenu(y, a);
             return Console.ReadKey();
         }
+        /// <summary>
+        /// Eine Methode zur Erstellung eines zentrierten Konsolen Menües ohne Rückgabewert. Parameter y: Stellt die Y-kordinate dar, Parameter a: Stellt den Allgemeinen abstand der Menu Punkte dar.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="a"></param>
         public static void CenteredVoidConsoleMenu(int y = 2, int a = 2)
         {
             CenteredWriteCursour("Konsolen Menue", y);

@@ -6,9 +6,16 @@ using System.Threading.Tasks;
 
 namespace Projekt_FelixAssert
 {
+    /// <summary>
+    /// Eine Klasse für die werte Eingaben mit spezieller Regelung.
+    /// </summary>
     [Version("F. Assert", classVersion = "1.0.0")]
     internal class WerteEingabe
     {
+        /// <summary>
+        /// Eingabe Methode zur Eingabe von Zahlen des Typen doubles mit mehrfachen restriktionen, wie auch ein paar sonder regelungen.
+        /// </summary>
+        /// <returns></returns>
         public static double GetDouble()
         {
 
